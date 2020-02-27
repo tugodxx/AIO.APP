@@ -42,5 +42,44 @@ namespace AIO.APP.Models
         {
             depObj.SetValue(LoadedCommandProperty, value);
         }
+
+        //--------------------------------
+        public static DependencyProperty UnloadedCommandProperty
+            = DependencyProperty.RegisterAttached(
+                "ClosingCommand",
+                typeof(ICommand),
+                typeof(MyAttachedBehaviors),
+                new PropertyMetadata(null, UnloadedCommandChanged));
+
+        private static void UnloadedCommandChanged
+            (DependencyObject depObj, DependencyPropertyChangedEventArgs e)
+        {
+            var frameworkElement = depObj as FrameworkElement;
+            if (frameworkElement != null && e.NewValue is ICommand)
+            {
+                frameworkElement.Unloaded 
+                    += (o, args) =>
+                    {
+                        (e.NewValue as ICommand).Execute(null);
+                    };
+            }
+        }
+
+        public static ICommand GetUnloadedCommand(DependencyObject depObj)
+        {
+            return (ICommand)depObj.GetValue(UnloadedCommandProperty);
+        }
+
+        public static void SetUnloadedCommand(
+            DependencyObject depObj,
+            ICommand  value)
+        {
+            depObj.SetValue(UnloadedCommandProperty, value);
+        }
+
+
+
+
+
     }
 }

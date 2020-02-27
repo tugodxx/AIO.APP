@@ -20,7 +20,7 @@ namespace AIO.APP.Views
     public class SettingViewModel: MVVMCViewModel
     {
         #region parameter
-        public string _outputPicDirStr=" Pictrue Folder Path";
+        private string _outputPicDirStr=" Pictrue Folder Path";
         public string OutputPicDirStr
         {
             get { return _outputPicDirStr; }
@@ -31,7 +31,7 @@ namespace AIO.APP.Views
             }
         }
 
-        public string _LogDirStr="Logging Folder Path";
+       private string _LogDirStr="Logging Folder Path";
         public string LogDirStr
         {
             get { return _LogDirStr; }
@@ -42,7 +42,7 @@ namespace AIO.APP.Views
             }
         }
 
-        public string _loDaDirStr="Local Data Folder Path";
+       private string _loDaDirStr="Local Data Folder Path";
         public string LoDaDirStr
         {
             get { return _loDaDirStr; }
@@ -64,7 +64,7 @@ namespace AIO.APP.Views
             }
         }
 
-        public string _remoteDbPort;
+        private string _remoteDbPort;
         public string RemoteDbPort
         {
             get { return _remoteDbPort; }
@@ -75,7 +75,7 @@ namespace AIO.APP.Views
             }
         }
 
-        public string _remoteDbUserName;
+       private string _remoteDbUserName;
         public string RemoteDbUserName
         {
             get { return _remoteDbUserName; }
@@ -86,7 +86,7 @@ namespace AIO.APP.Views
             }
         }
 
-        public string _remoteDbPassWord;
+        private string _remoteDbPassWord;
         public string RemoteDbPassWord
         {
             get { return _remoteDbPassWord; }
@@ -95,9 +95,8 @@ namespace AIO.APP.Views
                 _remoteDbPassWord = value;
                 OnPropertyChanged();
             }
-        }
-
-        public string _remoteDbTable;
+        } 
+        private string _remoteDbTable;
         public string RemoteDbTable
         {
             get { return _remoteDbTable; }
@@ -107,79 +106,69 @@ namespace AIO.APP.Views
                 OnPropertyChanged();
             }
         }
+
         #endregion
 
 
         #region command
-        public ICommand _selectPictureDirectoryCommand { get; set; }
+
+        private ICommand _selectPictureDirectoryCommand { get; set; }
 
         public ICommand SelectPictureDirectoryCommand
         {
             get
             {
-                if (_selectPictureDirectoryCommand  == null)
+                if (_selectPictureDirectoryCommand == null)
                 {
-                    _selectPictureDirectoryCommand  = new DelegateCommand(() =>
-                    {
-                        SelectPictureDirectoryHandler();
-                        
-                    });
+                    _selectPictureDirectoryCommand = new DelegateCommand(() => { SelectPictureDirectoryHandler(); });
                 }
+
                 return _selectPictureDirectoryCommand;
             }
         }
 
-        public ICommand _openLoggingDirectoryCommand { get; set; }
+        private ICommand _openLoggingDirectoryCommand { get; set; }
 
         public ICommand OpenLoggingDirectoryCommand
         {
             get
             {
-                if (_openLoggingDirectoryCommand  == null)
+                if (_openLoggingDirectoryCommand == null)
                 {
-                    _openLoggingDirectoryCommand  = new DelegateCommand(() =>
-                    {
-                        OpenFolder(LogDirStr);
-                        
-                    });
+                    _openLoggingDirectoryCommand = new DelegateCommand(() => { OpenFolder(LogDirStr); });
                 }
+
                 return _openLoggingDirectoryCommand;
             }
         }
 
-        public ICommand _openPictureDirectoryCommand { get; set; }
+        private ICommand _openPictureDirectoryCommand { get; set; }
 
         public ICommand OpenPictureDirectoryCommand
         {
             get
             {
-                if (_openPictureDirectoryCommand   == null)
+                if (_openPictureDirectoryCommand == null)
                 {
-                    _openPictureDirectoryCommand   = new DelegateCommand(() =>
-                    {
-                        OpenFolder(OutputPicDirStr);
-                        
-                    });
+                    _openPictureDirectoryCommand = new DelegateCommand(() => { OpenFolder(OutputPicDirStr); });
                 }
-                return _openPictureDirectoryCommand ;
+
+                return _openPictureDirectoryCommand;
             }
         }
 
-        public ICommand _openLocalDbDirectoryCommand { get; set; }
+        private ICommand _openLocalDbDirectoryCommand { get; set; }
 
         public ICommand OpenLocalDbDirectoryCommand
         {
             get
             {
-                if (_openLocalDbDirectoryCommand   == null)
+                if (_openLocalDbDirectoryCommand == null)
                 {
-                    _openLocalDbDirectoryCommand   = new DelegateCommand(() =>
-                    {
-                        OpenFolder(LoDaDirStr);
-                        
-                    });
+                    _openLocalDbDirectoryCommand = new DelegateCommand(() => { OpenFolder(LoDaDirStr); });
                 }
-                return _openLocalDbDirectoryCommand ;
+
+                return _openLocalDbDirectoryCommand;
             }
         }
 
@@ -210,15 +199,14 @@ namespace AIO.APP.Views
                 CreateNewDirectoryEnabled = true
             };
 
-            var result =  await OpenDirectoryDialog.ShowDialogAsync("RootDialog", dialogArgs);
+            var result = await OpenDirectoryDialog.ShowDialogAsync("RootDialog", dialogArgs);
 
             if (!result.Canceled)
             {
-                OutputPicDirStr =  result.DirectoryInfo.FullName;
+                OutputPicDirStr = result.DirectoryInfo.FullName;
             }
-
         }
-        
+
 
         public ICommand _saveConfigCommand { get; set; }
 
@@ -226,37 +214,38 @@ namespace AIO.APP.Views
         {
             get
             {
-                if (_saveConfigCommand   == null)
+                if (_saveConfigCommand == null)
                 {
-                    _saveConfigCommand   = new DelegateCommand(() =>
+                    _saveConfigCommand = new DelegateCommand(() =>
                     {
                         var inifile = new INIFile();
-                
+
                         inifile.SetValue("RemoteDataBase", "HostName", RemoteDbHostName);
                         inifile.SetValue("RemoteDataBase", "Port", RemoteDbPort);
                         inifile.SetValue("RemoteDataBase", "User", RemoteDbUserName);
                         inifile.SetValue("RemoteDataBase", "Password", RemoteDbPassWord);
                         inifile.SetValue("RemoteDataBase", "Table", RemoteDbTable);
-                        inifile.SetValue("OutputPicture","Dir",OutputPicDirStr);
-                        
+                        inifile.SetValue("OutputPicture", "Dir", OutputPicDirStr);
+
                         inifile.Persist("./config.ini");
 
                         InitialConfig.GetConfig();
                     });
                 }
-                return _saveConfigCommand ;
+
+                return _saveConfigCommand;
             }
         }
 
-        public ICommand _loadConfigCommand { get; set; }
+        private ICommand _loadConfigCommand { get; set; }
 
         public ICommand LoadConfigCommand
         {
             get
             {
-                if (_loadConfigCommand   == null)
+                if (_loadConfigCommand == null)
                 {
-                    _loadConfigCommand   = new DelegateCommand(() =>
+                    _loadConfigCommand = new DelegateCommand(() =>
                     {
                         OutputPicDirStr = MasterPara.OutputPicDir;
                         RemoteDbHostName = MasterPara.RemoteDb.HostName;
@@ -269,14 +258,11 @@ namespace AIO.APP.Views
                         LogDirStr = MasterPara.LoggingDir;
                     });
                 }
-                return _loadConfigCommand ;
+
+                return _loadConfigCommand;
             }
         }
 
-
-
-
         #endregion
-       
     }
 }

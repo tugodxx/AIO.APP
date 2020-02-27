@@ -38,9 +38,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AttachedCommandBehavior, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AttachedCommandBehavior.2.0.0.0\lib\net35\AttachedCommandBehavior.dll</HintPath>
-    </Reference>
     <Reference Include="DirectShowLib, Version=2.1.0.1599, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DirectShowLib.1.0.0\lib\DirectShowLib.dll</HintPath>
     </Reference>
@@ -118,6 +115,7 @@
     <Compile Include="Common.Utility\TryCast.cs" />
     <Compile Include="Common.Utility\TryConvertExtension.cs" />
     <Compile Include="Common.Utility\ValidationRuleExp.cs" />
+    <Compile Include="Models\BarcodeInfo.cs" />
     <Compile Include="Models\FastWebCam.cs" />
     <Compile Include="Models\InitialConfig.cs" />
     <Compile Include="Models\MasterPara.cs" />

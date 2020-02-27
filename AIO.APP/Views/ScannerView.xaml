@@ -2,6 +2,7 @@
     x:Class="AIO.APP.Views.ScannerView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:AIO.APP.Views"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -11,14 +12,21 @@
     xmlns:utility="clr-namespace:AIO.APP.Common.Utility"
     d:DesignHeight="863"
     d:DesignWidth="944"
-    models:MyAttachedBehaviors.LoadedCommand="{Binding LoadCameraCommand}"
     mc:Ignorable="d">
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="DragLeave">
+            <b:InvokeCommandAction Command="{Binding UnloadCameraCommand}" />
+        </b:EventTrigger>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding LoadCameraCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+    <!--    -->
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-
         <materialDesign:Card
             Grid.Column="0"
             Margin="6"
@@ -38,7 +46,10 @@
                         Style="{DynamicResource MaterialDesignGroupBox}"
                         UseLayoutRounding="True">
 
-                        <Image Source="{Binding StreamImg}" />
+                        <Image
+                            Width="440"
+                            Height="440"
+                            Source="{Binding StreamSource}" />
 
                     </GroupBox>
                 </Border>
@@ -51,7 +62,7 @@
                         SnapsToDevicePixels="True"
                         Style="{DynamicResource MaterialDesignGroupBox}"
                         UseLayoutRounding="True">
-                        <Image />
+                        <Image Source="{Binding BarcodeImg}" />
 
                     </GroupBox>
                 </Border>
@@ -134,7 +145,14 @@
                                 <RowDefinition Height="20" />
                                 <RowDefinition Height="30" />
                             </Grid.RowDefinitions>
-                            <StackPanel Orientation="Horizontal">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Orientation="Horizontal">
                                 <TextBlock
                                     Width="70"
                                     Margin="5,0"
@@ -147,31 +165,49 @@
                                     Margin="5,0"
                                     AcceptsReturn="True"
                                     FontSize="16"
-                                    Text="#############################################"
+                                    Text="{Binding BarcodeText}"
                                     TextWrapping="Wrap"
                                     VerticalScrollBarVisibility="Auto" />
-                                <Button
-                                    Width="100"
-                                    Margin="5,0"
-                                    HorizontalAlignment="Right"
-                                    Style="{StaticResource MaterialDesignRaisedButton}"
-                                    ToolTip="Resource name: MaterialDesignRaisedButton">
-                                    Submit
-                                </Button>
                             </StackPanel>
-                            <Separator Grid.Row="1" />
-                            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                            <Separator
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="1" />
+                            <StackPanel
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Orientation="Horizontal">
                                 <TextBlock
                                     Margin="5,0"
                                     FontSize="16"
                                     FontWeight="Bold"
                                     Text="Barcode Format: " />
                                 <TextBlock
-                                    Width="230"
+                                    Width="100"
                                     Margin="5,0"
                                     FontSize="16"
-                                    Text="#######" />
-
+                                    Text="{Binding BarcodeFormat}" />
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Row="0"
+                                Grid.RowSpan="3"
+                                Grid.Column="1">
+                                <Button
+                                    Width="100"
+                                    Margin="0,10"
+                                    HorizontalAlignment="Right"
+                                    Command="{Binding SubmitCommand}"
+                                    Style="{StaticResource MaterialDesignRaisedButton}">
+                                    Submit
+                                </Button>
+                                <Button
+                                    Width="100"
+                                    Margin="0,10"
+                                    HorizontalAlignment="Right"
+                                    Command="{Binding CancelCommand}"
+                                    Style="{StaticResource MaterialDesignRaisedButton}">
+                                    Cancel
+                                </Button>
                             </StackPanel>
 
                         </Grid>
@@ -203,15 +239,15 @@
                             Margin="5,0"
                             VerticalAlignment="Center"
                             ItemsSource="{Binding CameraList}"
-                            SelectedIndex="0" />
-                        <Button
+                            SelectedIndex="{Binding SelCameraIndex}" />
+                        <!-- <Button
                             Width="100"
                             Margin="5,0"
                             VerticalAlignment="Center"
                             Command="{Binding OpenCameraCommand}"
                             Style="{StaticResource MaterialDesignRaisedButton}">
                             Open
-                        </Button>
+                        </Button>-->
                     </StackPanel>
                     <!--  Operate  panel  -->
                     <StackPanel
@@ -227,8 +263,9 @@
                             Text="Auto Submit" />
                         <ToggleButton
                             Width="40"
-                            Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                            ToolTip="Default ToggleButton Style" />
+                            Command="{Binding SwitchAutoSubmitCommand}"
+                            IsChecked="{Binding IsAutoSubmit}"
+                            Style="{StaticResource MaterialDesignSwitchToggleButton}" />
                         <Border
                             Width="2"
                             Margin="5,0"
@@ -277,7 +314,7 @@
                             VerticalAlignment="Center"
                             FontSize="13">
                             <TextBox.Text>
-                                <Binding Path="llll">
+                                <Binding Path="Dectdelay">
                                     <Binding.ValidationRules>
                                         <utility:ValidationRuleExp checkType="0" />
                                     </Binding.ValidationRules>
@@ -308,7 +345,7 @@
                             VerticalAlignment="Center"
                             FontSize="13">
                             <TextBox.Text>
-                                <Binding Path="llll">
+                                <Binding Path="Switchdelay">
                                     <Binding.ValidationRules>
                                         <utility:ValidationRuleExp checkType="0" />
                                     </Binding.ValidationRules>
@@ -340,7 +377,7 @@
                             VerticalAlignment="Center"
                             FontSize="13">
                             <TextBox.Text>
-                                <Binding Path="llll">
+                                <Binding Path="Threshold">
                                     <Binding.ValidationRules>
                                         <utility:ValidationRuleExp checkType="0" />
                                     </Binding.ValidationRules>
@@ -357,7 +394,7 @@
                             Width="100"
                             Margin="20,0"
                             VerticalAlignment="Center"
-                            Command="{Binding OpenC}"
+                            Command="{Binding StartCameraCommand}"
                             Style="{StaticResource MaterialDesignRaisedButton}">
                             Start
                         </Button>
@@ -365,6 +402,7 @@
                             Width="100"
                             Margin="20,0"
                             VerticalAlignment="Center"
+                            Command="{Binding StopCameraCommand}"
                             Style="{StaticResource MaterialDesignRaisedButton}">
                             Stop
                         </Button>

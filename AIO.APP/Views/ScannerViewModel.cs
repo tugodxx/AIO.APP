@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -26,7 +27,7 @@ namespace AIO.APP.Views
     {
         static VideoCapture _capture;
         static Mat _frame;
-        static Bitmap _image;
+        static Mat _image;
         static Thread _cameraThread;
         static Thread _imageThread;
         bool _isCameraRunning;
@@ -102,17 +103,6 @@ namespace AIO.APP.Views
 
 
 
-
-
-
-
-
-
-
-
-
-
-
         private string _barcodeFormat="####";
 
         public string BarcodeFormat
@@ -126,9 +116,9 @@ namespace AIO.APP.Views
         }
 
 
-        private BitmapSource _streamSource;
+        private BitmapImage _streamSource;
 
-        public BitmapSource StreamSource
+        public BitmapImage StreamSource
         {
             get { return _streamSource; }
             set
@@ -138,9 +128,9 @@ namespace AIO.APP.Views
             }
 
         }
-        private BitmapSource _barcodeImg;
+        private BitmapImage _barcodeImg;
 
-        public BitmapSource BarcodeImg
+        public BitmapImage BarcodeImg
         {
             get { return _barcodeImg; }
             set
@@ -373,9 +363,10 @@ namespace AIO.APP.Views
             while (_isCameraRunning)
             {
                 _capture.Read(_frame);
-                _image = _frame.ToBitmap();
+                _image = _frame;
+               // Cv2.ImShow("camera", _frame);
                // StreamImg?.Dispose();
-               StreamSource = _image.ToBitmapSource();
+               //StreamSource = _image.ToBitmapSource();
 
                if (IsAutoSubmit | waitpic)
                {
@@ -428,10 +419,30 @@ namespace AIO.APP.Views
                     }
 
                 }
-                    
+                MemoryStream ms = new MemoryStream();
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.StreamSource = _frame.ToMemoryStream(".bmp");
+                bitmapImage.EndInit();
+                bitmapImage.Freeze();
+                StreamSource = bitmapImage;
+
+                MemoryStream ms2 = new MemoryStream();
+                BitmapImage bitmapImage2 = new BitmapImage();
+
+                if (_cropimgMat != null)
+                {
+                        bitmapImage2.BeginInit();
+                        bitmapImage2.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmapImage2.StreamSource = _cropimgMat.ToMemoryStream(".bmp");
+                        bitmapImage2.EndInit();
+                        bitmapImage2.Freeze();
+                        BarcodeImg = bitmapImage2;
+                    }
+
                 
-                //  Cv2.ImShow("111",_frame);
-                Cv2.WaitKey(1);
+        
             }
         }
 
@@ -594,7 +605,7 @@ namespace AIO.APP.Views
 
             _cropimgMat =   barcode;
             
-            Cv2.ImShow("Barcode", barcode);
+          //  Cv2.ImShow("Barcode", barcode);
 
            // Cv2.WaitKey(1); // do events
 
